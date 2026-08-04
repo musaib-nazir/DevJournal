@@ -7,7 +7,7 @@ const {authMiddleware} = require("../middleware/authMiddleware");
 
 
 
-router.post("/projects",authMiddleware,createProject);
+router.post("/project",authMiddleware,createProject);
 
 
 module.exports = router;

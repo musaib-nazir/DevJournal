@@ -32,3 +32,5 @@ owner: {
 
 
 )
+const Project = mongoose.model("Project", projectSchema);
+module.exports = Project;
