@@ -1,25 +1,28 @@
 // User Model
 // Stores authentication and account information for each DevJournal user.
 
+const mongoose = require("mongoose");
 
-const mongoose = require('mongoose');
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+      minlength: 3,
+      maxlength: 30,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      lowercase: true,
+    },
+    password: { type: String, required: true, minlength: 6 },
+  },
+  { timestamps: true },
+);
+const User = mongoose.model("User", userSchema);
 
-const userSchema= new mongoose.Schema({
-    
-
-name:{type:String,required:true},
-email:{type:String,required:true,unique:true,trim:true,lowercase:true},
-password:{type:String,required:true},
-
-
-
-
-
-
-
-
-},{timestamps:true})
-const User = mongoose.model("User",userSchema);
-
-
-module.exports=User;
+module.exports = User;
