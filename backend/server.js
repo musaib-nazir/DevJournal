@@ -4,13 +4,18 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 const conDB = require("./config/conDB");
+const cookieParser = require("cookie-parser");
 const authRoutes = require("./routes/authRoutes");
+const entryRoutes=require("./routes/entryRoutes")
+
 const projectRoutes = require("./routes/projectRoutes");
 const Port = process.env.PORT;
 //databse connection
 conDB();
 app.use(express.json())
 
+
+app.use(cookieParser());
 
 app.get("/",(req,res)=>{
 
@@ -21,6 +26,7 @@ app.get("/",(req,res)=>{
 //authroutes:
 app.use("/api/auth",authRoutes);
 app.use("/api/projects",projectRoutes);
+app.use("/api/entries",entryRoutes)
 
 
 

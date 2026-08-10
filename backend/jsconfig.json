@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "checkJs": false,
+    "module": "Node16",
+    "moduleResolution": "Node16",
+    "target": "es2020"
+  },
+  "include": ["**/*.js"],
+  "exclude": ["node_modules"]
+}

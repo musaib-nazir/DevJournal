@@ -1,8 +1,6 @@
 const User = require("../modals/User");
-const  bcrypt = require("bcrypt");
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-
-
 
 const register = async (req, res) => {
   const { name, email, password } = req.body;
@@ -17,11 +15,11 @@ const register = async (req, res) => {
       res.status(400).json({ error: "User already exists" });
     } else {
       // Create new user
-      const hashedPassword = await bcrypt.hash(password,10);
-            const newUser = new User({ name, email, password:hashedPassword });
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const newUser = new User({ name, email, password: hashedPassword });
       await newUser.save();
 
-       return res.status(201).json({ message: "User registered successfully" });
+      return res.status(201).json({ message: "User registered successfully" });
     }
   } catch (err) {
     console.error(err);
@@ -33,36 +31,56 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    if (!email || !password) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+    const isUser = await User.findOne({ email });
+    if (!isUser) {
+      return res.status(400).json({ error: "User not found" });
+    }
+    const isPasswordValid = await bcrypt.compare(password, isUser.password);
+    if (!isPasswordValid) {
+      return res.status(400).json({ error: "Invalid credentials" });
+    }
 
-const {email,password} = req.body;
+    const token = jwt.sign({ id: isUser._id }, process.env.JWT_SECRET);
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false, // true when using HTTPS
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return res.status(200).json({ message: "Login successful" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const logout = (req,res)=>{
 try{
 
 
-if(!email || !password){
-  return res.status(400).json({error:"All fields are required"})}
-    const isUser = await User.findOne({ email});
-    if(!isUser){
-      return res.status(400).json({error:"User not found"})
-    }
-    const isPasswordValid = await bcrypt.compare(password, isUser.password);
-    if(!isPasswordValid){
-      return res.status(400).json({error:"Invalid credentials"})
-    }
+res.clearCookie("token");
+return res.status(200).json({message:"Logout successful"})
 
-    const token = jwt.sign({id:isUser._id},process.env.JWT_SECRET);
 
-    return res.status(200).json({message:"Login successful", token});
 
-  }
-catch(err){
-  console.error(err);
-  res.status(500).json({message:err.message})}
-
+}catch(err){
+    console.error(err);
+    res.status(500).json({ message: err.message }); }
 
 
 
 }
 
-module.exports={register,
-login
-}
+
+
+
+
+
+
+module.exports = { register, login , logout };
